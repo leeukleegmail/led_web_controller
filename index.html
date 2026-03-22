@@ -33,9 +33,15 @@
     </div>
     
     <script>
-        const PIN = '1234'; // Change this to your desired PIN
         const TIMEOUT = 60000; // 60 seconds
         let timeoutId;
+        
+        // PIN is injected by main.py from credentials.py
+        let PIN = '0000';
+
+        function setPin(p) {
+            PIN = p;
+        }
         
         const pinForm = document.getElementById('pinForm');
         const controls = document.getElementById('controls');

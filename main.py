@@ -1,6 +1,7 @@
 import machine
 import neopixel
 import socket
+import credentials
 
 # LED strip configuration
 NUM_LEDS = 8  # Number of LEDs in the strip
@@ -18,6 +19,8 @@ def load_html():
         return '<h1>Error: Could not load index.html</h1>'
 
 html = load_html()
+# Inject PIN from credentials into HTML
+html = html.replace("let PIN = '0000';", "let PIN = '%s';" % credentials.PIN)
 
 def web_page():
     return html
