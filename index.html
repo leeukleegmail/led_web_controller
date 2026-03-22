@@ -8,19 +8,69 @@
         body { font-family: Arial, sans-serif; text-align: center; margin-top: 20px; }
         canvas { border: 1px solid #ccc; cursor: crosshair; }
         #colorDisplay { width: 50px; height: 50px; border: 1px solid #000; display: inline-block; margin-left: 20px; }
-        button { padding: 10px 20px; font-size: 16px; margin-top: 20px; }
+        #pinForm { display: block; }
+        #controls { display: none; }
     </style>
 </head>
 <body>
     <h1>LED Lightstrip Color Control</h1>
-    <p>Click on the color wheel to select a color:</p>
-    <canvas id="colorWheel" width="300" height="300"></canvas>
-    <div id="colorDisplay"></div>
-    <br>
-    <label for="brightness">Brightness:</label>
-    <input type="range" id="brightness" min="0" max="255" value="255">
-    <span id="brightnessValue">255</span>
+    
+    <div id="pinForm">
+        <p>Enter PIN to access controls:</p>
+        <input type="password" id="pinInput" maxlength="4">
+        <button onclick="checkPin()">Submit</button>
+        <p id="pinError" style="color: red; display: none;">Incorrect PIN</p>
+    </div>
+    
+    <div id="controls">
+        <p>Click on the color wheel to select a color:</p>
+        <canvas id="colorWheel" width="300" height="300"></canvas>
+        <div id="colorDisplay"></div>
+        <br>
+        <label for="brightness">Brightness:</label>
+        <input type="range" id="brightness" min="0" max="255" value="255">
+        <span id="brightnessValue">255</span>
+    </div>
+    
     <script>
+        const PIN = '1234'; // Change this to your desired PIN
+        const TIMEOUT = 60000; // 60 seconds
+        let timeoutId;
+        
+        const pinForm = document.getElementById('pinForm');
+        const controls = document.getElementById('controls');
+        const pinInput = document.getElementById('pinInput');
+        const pinError = document.getElementById('pinError');
+        
+        function checkPin() {
+            if (pinInput.value === PIN) {
+                pinForm.style.display = 'none';
+                controls.style.display = 'block';
+                pinError.style.display = 'none';
+                startTimeout();
+                pinInput.value = '';
+            } else {
+                pinError.style.display = 'block';
+            }
+        }
+        
+        function startTimeout() {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                controls.style.display = 'none';
+                pinForm.style.display = 'block';
+            }, TIMEOUT);
+        }
+        
+        function resetTimeout() {
+            startTimeout();
+        }
+        
+        // Add event listeners to controls for resetting timeout
+        document.getElementById('colorWheel').addEventListener('click', resetTimeout);
+        document.getElementById('brightness').addEventListener('input', resetTimeout);
+        
+        // Existing code for color wheel and brightness
         const canvas = document.getElementById('colorWheel');
         const ctx = canvas.getContext('2d');
         const colorDisplay = document.getElementById('colorDisplay');
