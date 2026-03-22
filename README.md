@@ -1,6 +1,15 @@
 # ESP32S3 LED Lightstrip Web Controller
 
-This project uses MicroPython on an ESP32S3 board to control an LED lightstrip via a web interface. The color can be selected using a color wheel (HTML5 color picker).
+This project uses MicroPython on an ESP32S3 board to control an LED lightstrip via a web interface. Colors are selected using an interactive color wheel, and brightness can be adjusted with a slider. Changes are applied automatically without needing to click buttons.
+
+## Features
+
+- Interactive color wheel showing RGB color space
+- White light option (center of wheel)
+- Brightness control slider (0-255)
+- Real-time color updates
+- Web server running on ESP32
+- Mobile-friendly interface
 
 ## Hardware Requirements
 
@@ -11,16 +20,15 @@ This project uses MicroPython on an ESP32S3 board to control an LED lightstrip v
 
 ## Circuit Diagram
 
-```
-ESP32S3 Board          LED Lightstrip
--------------          -------------
-GND ------------------- GND
-5V  ------------------- 5V (if powered from ESP32, otherwise external power)
-GPIO 48 --------------- Data In
+See [circuit_diagram.txt](circuit_diagram.txt) for detailed connection instructions.
 
-Note: For longer strips or higher brightness, use an external 5V power supply.
-Connect the external power's GND to ESP32 GND for common ground.
-```
+## Project Structure
+
+- `boot.py`: WiFi connection setup (runs on boot)
+- `main.py`: Web server and LED control logic
+- `index.html`: Web interface with color wheel and brightness slider
+- `README.md`: This file
+- `circuit_diagram.txt`: Circuit connection details
 
 ## Software Setup
 
@@ -29,23 +37,29 @@ Connect the external power's GND to ESP32 GND for common ground.
    - Use esptool.py or Thonny IDE to flash the firmware to your ESP32S3 board.
 
 2. **Upload the code:**
-   - Use Thonny IDE, uPyCraft, or ampy to upload `main.py` to the ESP32S3.
-   - Update the WiFi credentials in `main.py` (SSID and PASSWORD).
+   - Upload all files (`boot.py`, `main.py`, `index.html`) to the ESP32S3 using Thonny IDE, uPyCraft, or ampy.
+   - Update WiFi credentials in `boot.py` (SSID and PASSWORD).
+   - Update LED configuration in `main.py` (`NUM_LEDS` and `PIN`).
 
-3. **Configure LED strip:**
-   - Update `NUM_LEDS` and `PIN` in `main.py` according to your setup.
-
-4. **Run the code:**
+3. **Run the code:**
    - Reset the ESP32S3. It will connect to WiFi and start the web server.
    - Note the IP address printed in the serial console.
 
-5. **Access the web interface:**
+4. **Access the web interface:**
    - Open a web browser and go to `http://<ESP32_IP>`
-   - Use the color picker to select a color and click "Set Color" to change the LED strip color.
+   - Click on the color wheel to select colors or adjust brightness with the slider.
+   - Changes are applied automatically to the LED strip.
+
+## Usage
+
+- **Color Selection**: Click anywhere on the color wheel. The center provides white light.
+- **Brightness**: Use the slider to adjust overall brightness (0 = off, 255 = full).
+- **Mobile**: The interface works on mobile devices connected to the same WiFi network.
 
 ## Notes
 
-- The color picker uses the browser's native color input, which provides a color wheel on most devices.
-- The web server is basic and serves a single page.
+- Ensure your device is on the same WiFi network as the ESP32 for access.
+- For longer strips, use an external power supply to avoid overloading the ESP32.
+- The color wheel represents the full RGB color gamut achievable with LED strips.
 - For security, consider adding authentication if deploying in a public network.
 - Ensure the ESP32S3 has sufficient power; use external power for the LED strip if necessary.
