@@ -27,6 +27,7 @@ See [circuit_diagram.txt](circuit_diagram.txt) for detailed connection instructi
 - `boot.py`: WiFi connection setup (runs on boot)
 - `main.py`: Web server and LED control logic
 - `index.html`: Web interface with color wheel and brightness slider
+- `credentials.py`: WiFi credentials (not committed to git)
 - `README.md`: This file
 - `circuit_diagram.txt`: Circuit connection details
 
@@ -37,8 +38,8 @@ See [circuit_diagram.txt](circuit_diagram.txt) for detailed connection instructi
    - Use esptool.py or Thonny IDE to flash the firmware to your ESP32S3 board.
 
 2. **Upload the code:**
-   - Upload all files (`boot.py`, `main.py`, `index.html`) to the ESP32S3 using Thonny IDE, uPyCraft, or ampy.
-   - Update WiFi credentials in `boot.py` (SSID and PASSWORD).
+   - Upload all files (`boot.py`, `main.py`, `index.html`, `credentials.py`) to the ESP32S3 using Thonny IDE, uPyCraft, or ampy.
+   - Update WiFi credentials in `credentials.py` (SSID and PASSWORD).
    - Update LED configuration in `main.py` (`NUM_LEDS` and `PIN`).
 
 3. **Run the code:**

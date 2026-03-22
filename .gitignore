@@ -120,3 +120,4 @@ Thumbs.db
 
 # MicroPython specific
 # Add any ESP32 specific files if needed
+credentials.py

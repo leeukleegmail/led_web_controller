@@ -1,15 +1,12 @@
 import network
 import time
-
-# WiFi credentials - Update these with your network details
-SSID = 'WIFI@HOME'
-PASSWORD = '78P@55word'
+import credentials
 
 # Connect to WiFi
 print("Connecting wifi")
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
-wlan.connect(SSID, PASSWORD)
+wlan.connect(credentials.SSID, credentials.PASSWORD)
 
 while not wlan.isconnected():
     time.sleep(1)
