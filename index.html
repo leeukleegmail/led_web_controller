@@ -38,9 +38,19 @@
         
         // PIN is injected by main.py from credentials.py
         let PIN = '0000';
+        let PIN_DISABLED = false;
 
         function setPin(p) {
             PIN = p;
+        }
+
+        function setPinDisabled(d) {
+            PIN_DISABLED = d;
+            if (PIN_DISABLED) {
+                pinForm.style.display = 'none';
+                controls.style.display = 'block';
+                startTimeout();
+            }
         }
         
         const pinForm = document.getElementById('pinForm');
@@ -49,7 +59,7 @@
         const pinError = document.getElementById('pinError');
         
         function checkPin() {
-            if (pinInput.value === PIN) {
+            if (PIN_DISABLED || pinInput.value === PIN) {
                 pinForm.style.display = 'none';
                 controls.style.display = 'block';
                 pinError.style.display = 'none';

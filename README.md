@@ -59,6 +59,7 @@ See [circuit_diagram.txt](circuit_diagram.txt) for detailed connection instructi
 - **Color Selection**: Click anywhere on the color wheel. The center provides white light.
 - **Brightness**: Use the slider to adjust overall brightness (0 = off, 255 = full).
 - **Timeout**: Controls lock after 60 seconds of inactivity, requiring PIN re-entry.
+- **PIN disabling**: Set `pin_disabled = True` in `credentials.py` to skip PIN input altogether.
 - **Mobile**: The interface works on mobile devices connected to the same WiFi network.
 
 ## Notes

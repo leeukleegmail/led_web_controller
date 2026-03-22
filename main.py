@@ -19,8 +19,9 @@ def load_html():
         return '<h1>Error: Could not load index.html</h1>'
 
 html = load_html()
-# Inject PIN from credentials into HTML
+# Inject PIN and pin_disabled flag from credentials into HTML
 html = html.replace("let PIN = '0000';", "let PIN = '%s';" % credentials.PIN)
+html = html.replace("let PIN_DISABLED = false;", "let PIN_DISABLED = %s;" % str(credentials.pin_disabled).lower())
 
 def web_page():
     return html
