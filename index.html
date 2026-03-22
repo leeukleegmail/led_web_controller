@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LED Color Control</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 20px; }
+        canvas { border: 1px solid #ccc; cursor: crosshair; }
+        #colorDisplay { width: 50px; height: 50px; border: 1px solid #000; display: inline-block; margin-left: 20px; }
+        button { padding: 10px 20px; font-size: 16px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>LED Lightstrip Color Control</h1>
+    <p>Click on the color wheel to select a color:</p>
+    <canvas id="colorWheel" width="300" height="300"></canvas>
+    <div id="colorDisplay"></div>
+    <br>
+    <label for="brightness">Brightness:</label>
+    <input type="range" id="brightness" min="0" max="255" value="255">
+    <span id="brightnessValue">255</span>
+    <script>
+        const canvas = document.getElementById('colorWheel');
+        const ctx = canvas.getContext('2d');
+        const colorDisplay = document.getElementById('colorDisplay');
+        const brightnessSlider = document.getElementById('brightness');
+        const brightnessValue = document.getElementById('brightnessValue');
+        let selectedColor = '#ffffff';
+        let baseHSL = {h: 0, s: 0, l: 1}; // start with white
+        let brightness = 255;
+
+        function updateSelectedColor() {
+            const rgb = hslToRgb(baseHSL.h / 360, baseHSL.s, baseHSL.l);
+            const scaledRGB = rgb.map(x => Math.round(x * brightness / 255));
+            selectedColor = rgbToHex(scaledRGB[0], scaledRGB[1], scaledRGB[2]);
+            colorDisplay.style.backgroundColor = selectedColor;
+        }
+
+        brightnessSlider.addEventListener('input', (e) => {
+            brightness = parseInt(e.target.value);
+            brightnessValue.textContent = brightness;
+            updateSelectedColor();
+            setColor();
+        });
+
+        function drawColorWheel() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(centerX, centerY) - 10;
+
+            for (let angle = 0; angle < 360; angle++) {
+                for (let sat = 0; sat <= 1; sat += 0.01) {
+                    const hue = angle;
+                    const lightness = sat === 0 ? 1 : 0.5;
+                    const x = centerX + sat * radius * Math.cos(angle * Math.PI / 180);
+                    const y = centerY + sat * radius * Math.sin(angle * Math.PI / 180);
+                    ctx.fillStyle = `hsl(${hue}, ${sat * 100}%, ${lightness * 100}%)`;
+                    ctx.fillRect(x, y, 2, 2);
+                }
+            }
+        }
+
+        function getColorAtPosition(x, y) {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(centerX, centerY) - 10;
+            const dx = x - centerX;
+            const dy = y - centerY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance > radius) return null;
+            const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+            const hue = (angle + 360) % 360;
+            const sat = distance / radius;
+            const lightness = sat < 0.01 ? 1 : 0.5;
+            return { h: hue, s: sat, l: lightness };
+        }
+
+        function hslToRgb(h, s, l) {
+            let r, g, b;
+            if (s === 0) {
+                r = g = b = l;
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1/6) return p + (q - p) * 6 * t;
+                    if (t < 1/2) return q;
+                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    return p;
+                };
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1/3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1/3);
+            }
+            return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+        }
+
+        function rgbToHex(r, g, b) {
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
+
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const hsl = getColorAtPosition(x, y);
+            if (hsl) {
+                baseHSL = hsl;
+                updateSelectedColor();
+                setColor();
+            }
+        });
+
+        drawColorWheel();
+        updateSelectedColor();
+
+        function setColor() {
+            fetch('/set_color', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain',
+                },
+                body: selectedColor
+            });
+        }
+    </script>
+</body>
+</html>

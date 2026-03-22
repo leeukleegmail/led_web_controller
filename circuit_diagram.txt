@@ -1,0 +1,37 @@
+Circuit Diagram for ESP32S3 LED Lightstrip Controller
+
+Components:
+- ESP32S3 microcontroller board
+- WS2812 LED lightstrip (or compatible)
+- Jumper wires
+- Optional: External 5V power supply for the LED strip
+
+Connections:
+
+ESP32S3 Pinout:
+- GPIO 48 (Data) --> LED Strip Data In
+- 5V --> LED Strip 5V (if using ESP32 power, otherwise connect to external power)
+- GND --> LED Strip GND and External Power GND (if used)
+
+ASCII Diagram:
+
+[ESP32S3 Board]
+   |   |
+   |   |--- GPIO 48 ------------------- Data In --- [LED Strip]
+   |   |
+   |   |--- 5V ------------------------ 5V ---------- [LED Strip]
+   |   |
+   |   |--- GND ----------------------- GND ---------- [LED Strip]
+   |   |
+   |   |--- GND ----------------------- GND ---------- [External Power Supply] (optional)
+   |   |
+   |   |--- 5V ------------------------ 5V ---------- [External Power Supply] (optional)
+
+Power Notes:
+- For short LED strips, ESP32's 5V pin can power them.
+- For longer strips (>10-20 LEDs), use a separate 5V power supply to avoid overloading the ESP32.
+- Ensure common ground between ESP32 and external power.
+
+Safety:
+- Do not exceed the current limits of your power supply.
+- Use appropriate wire gauges for power connections.
