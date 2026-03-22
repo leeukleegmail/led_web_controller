@@ -10,7 +10,7 @@ wlan.connect(credentials.SSID, credentials.PASSWORD)
 
 while not wlan.isconnected():
     time.sleep(1)
-    print("Attempting to connect to network")
+    print(f"Attempting to connect to network {credentials.SSID}")
 
 print('Connected to WiFi')
 ip = wlan.ifconfig()[0]
