@@ -4,7 +4,7 @@ import socket
 import credentials
 
 # LED strip configuration
-NUM_LEDS = 8  # Number of LEDs in the strip
+NUM_LEDS = 64  # Number of LEDs in the strip
 PIN = 5  # GPIO pin connected to the data line of the LED strip (adjust for ESP32S3)
 
 # Initialize NeoPixel strip
@@ -32,7 +32,7 @@ def set_color(color_hex):
     g = int(color_hex[3:5], 16)
     b = int(color_hex[5:7], 16)
     # Set all LEDs to the selected color
-    for i in range(8):
+    for i in range(NUM_LEDS):
         np[i] = (r, g, b)
     np.write()
     print(f'Color set to {color_hex}')
