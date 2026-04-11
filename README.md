@@ -33,6 +33,7 @@ See [circuit_diagram.txt](circuit_diagram.txt) for detailed connection instructi
 - `credentials.py`: WiFi credentials (not committed to git)
 - `README.md`: This file
 - `circuit_diagram.txt`: Circuit connection details
+- `scripts/local_preview_server.py`: Separate reusable local web UI preview server
 
 ## Software Setup
 
@@ -66,6 +67,32 @@ See [circuit_diagram.txt](circuit_diagram.txt) for detailed connection instructi
 - **Mobile**: The interface works on mobile devices connected to the same WiFi network.
 
 VS Code is configured to use the local `typings/` stubs for `machine`, `neopixel`, and `network` while editing.
+
+## Local UI Preview (No Device Required)
+
+A separate reusable preview server is included so you can test the web interface on your Mac without an ESP32 connected.
+
+1. Start the preview server from the project folder:
+
+   ```bash
+   python3 scripts/local_preview_server.py --root . --port 8000
+   ```
+
+   Or in VS Code run the task `Local UI Preview`.
+   Then you can run the task `Open Local UI Preview` to open it automatically.
+
+2. Open the preview in your browser:
+
+   ```text
+   http://127.0.0.1:8000
+   ```
+
+3. Optional flags:
+   - `--pin 1234` to inject a custom preview PIN
+   - `--pin-disabled` to skip the PIN prompt
+   - `--root /path/to/project` to reuse the same preview tool in another project
+
+The color wheel, brightness slider, party mode toggle, and party speed slider will all respond locally, while the mock server logs the actions in the terminal.
 
 ## Deploy to the ESP32
 
