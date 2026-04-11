@@ -14,6 +14,7 @@
         .modeCard { margin: 16px auto; padding: 12px; max-width: 320px; border: 1px solid #ddd; border-radius: 10px; background: #fafafa; }
         .modeHint { font-size: 0.9rem; color: #555; margin-top: 6px; }
         #modeStatus { display: block; margin-top: 8px; font-weight: bold; color: #5a2ca0; }
+        #partySpeedControls { display: none; margin-top: 12px; }
     </style>
 </head>
 <body>
@@ -35,6 +36,12 @@
             </label>
             <span id="modeStatus">Manual colour mode</span>
             <div class="modeHint">Cycles rainbow chases and sparkles to show off the LEDs.</div>
+            <div id="partySpeedControls">
+                <label for="partySpeed">Party speed:</label>
+                <input type="range" id="partySpeed" min="1" max="10" value="7">
+                <span id="partySpeedValue">7</span>
+                <div class="modeHint">Move left for slower effects and right for faster animation.</div>
+            </div>
         </div>
 
         <p>Click on the color wheel to select a color:</p>
@@ -100,6 +107,7 @@
         document.getElementById('colorWheel').addEventListener('click', resetTimeout);
         document.getElementById('brightness').addEventListener('input', resetTimeout);
         document.getElementById('partyModeToggle').addEventListener('change', resetTimeout);
+        document.getElementById('partySpeed').addEventListener('input', resetTimeout);
         
         // Existing code for color wheel and brightness
         const canvas = document.getElementById('colorWheel');
@@ -108,6 +116,9 @@
         const brightnessSlider = document.getElementById('brightness');
         const brightnessValue = document.getElementById('brightnessValue');
         const partyModeToggle = document.getElementById('partyModeToggle');
+        const partySpeedControls = document.getElementById('partySpeedControls');
+        const partySpeedSlider = document.getElementById('partySpeed');
+        const partySpeedValue = document.getElementById('partySpeedValue');
         const modeStatus = document.getElementById('modeStatus');
         let selectedColor = '#ffffff';
         let baseHSL = {h: 0, s: 0, l: 1}; // start with white
@@ -122,11 +133,31 @@
 
         function updateModeStatus(enabled) {
             modeStatus.textContent = enabled ? 'Party mode is active' : 'Manual colour mode';
+            partySpeedControls.style.display = enabled ? 'block' : 'none';
+        }
+
+        function setPartySpeed(value) {
+            const speed = parseInt(value, 10);
+            partySpeedSlider.value = speed;
+            partySpeedValue.textContent = speed;
+
+            fetch('/set_party_speed', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain',
+                },
+                body: String(speed)
+            });
         }
 
         function setPartyMode(enabled) {
             partyModeToggle.checked = enabled;
             updateModeStatus(enabled);
+
+            if (enabled) {
+                setPartySpeed(partySpeedSlider.value);
+            }
+
             fetch('/set_mode', {
                 method: 'POST',
                 headers: {
@@ -145,6 +176,13 @@
 
         partyModeToggle.addEventListener('change', (e) => {
             setPartyMode(e.target.checked);
+        });
+
+        partySpeedSlider.addEventListener('input', (e) => {
+            partySpeedValue.textContent = e.target.value;
+            if (partyModeToggle.checked) {
+                setPartySpeed(e.target.value);
+            }
         });
 
         function drawColorWheel() {

@@ -7,16 +7,20 @@ import credentials
 # LED strip configuration
 NUM_LEDS = 64  # Number of LEDs in the strip
 PIN = 5  # GPIO pin connected to the data line of the LED strip
-PARTY_STEP_MS = 120
+MIN_PARTY_STEP_MS = 30
+MAX_PARTY_STEP_MS = 300
+DEFAULT_PARTY_SPEED = 7
 
 np = neopixel.NeoPixel(machine.Pin(PIN), NUM_LEDS)
 current_color = '#FFFFFF'
 party_mode = False
 party_offset = 0
 last_party_update = 0
+party_speed = DEFAULT_PARTY_SPEED
+party_step_ms = 120
 
-ticks_ms = time.ticks_ms  # pyright: ignore[reportAttributeAccessIssue]
-ticks_diff = time.ticks_diff  # pyright: ignore[reportAttributeAccessIssue]
+ticks_ms = getattr(time, 'ticks_ms', lambda: int(time.time() * 1000))
+ticks_diff = getattr(time, 'ticks_diff', lambda now, start: now - start)
 
 
 def web_page():
@@ -97,6 +101,24 @@ def run_party_mode_step():
     last_party_update = ticks_ms()
 
 
+def set_party_speed(speed_value):
+    global party_speed, party_step_ms
+
+    try:
+        speed = int(speed_value)
+    except (TypeError, ValueError):
+        return
+
+    if speed < 1:
+        speed = 1
+    elif speed > 10:
+        speed = 10
+
+    party_speed = speed
+    party_step_ms = MAX_PARTY_STEP_MS - ((speed - 1) * (MAX_PARTY_STEP_MS - MIN_PARTY_STEP_MS) // 9)
+    print('Party speed set to %d' % party_speed)
+
+
 def set_party_mode(enabled):
     global party_mode, party_offset, last_party_update
     party_mode = enabled
@@ -141,6 +163,9 @@ def handle_client(conn):
         enabled = mode_value in ('party=on', 'party=true', 'party=1', 'on', 'true', '1')
         set_party_mode(enabled)
         send_response(conn, 'Party mode on' if enabled else 'Party mode off')
+    elif 'POST /set_party_speed' in request:
+        set_party_speed(get_request_body(request))
+        send_response(conn, 'Party speed set')
     else:
         send_response(conn, 'Not found', status='404 Not Found')
 
@@ -149,13 +174,13 @@ def start_server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind(('', 80))
     server.listen(5)
-    server.settimeout(PARTY_STEP_MS / 1000)
+    server.settimeout(MIN_PARTY_STEP_MS / 1000)
 
     # Set default colour
     set_color(current_color)
 
     while True:
-        if party_mode and ticks_diff(ticks_ms(), last_party_update) >= PARTY_STEP_MS:
+        if party_mode and ticks_diff(ticks_ms(), last_party_update) >= party_step_ms:
             run_party_mode_step()
 
         try:

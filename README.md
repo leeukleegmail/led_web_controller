@@ -8,6 +8,7 @@ This project uses MicroPython on an ESP32 board to control an LED lightstrip via
 - White light option (center of wheel)
 - Brightness control slider (0-255)
 - Party/demo mode with animated rainbow and sparkle effects
+- Adjustable speed slider for the party light show
 - Real-time color updates
 - PIN-protected access with 60-second timeout
 - Web server running on ESP32
@@ -59,6 +60,7 @@ See [circuit_diagram.txt](circuit_diagram.txt) for detailed connection instructi
 - **PIN Access**: Enter the 4-digit PIN to unlock the color controls. Default PIN is 1234.
 - **Color Selection**: Click anywhere on the color wheel. The center provides white light.
 - **Brightness**: Use the slider to adjust overall brightness (0 = off, 255 = full).
+- **Party mode speed**: When party mode is enabled, a speed slider appears so you can slow down or speed up the light show.
 - **Timeout**: Controls lock after 60 seconds of inactivity, requiring PIN re-entry.
 - **PIN disabling**: Set `pin_disabled = True` in `credentials.py` to skip PIN input altogether.
 - **Mobile**: The interface works on mobile devices connected to the same WiFi network.
