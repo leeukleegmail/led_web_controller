@@ -10,6 +10,10 @@
         #colorDisplay { width: 50px; height: 50px; border: 1px solid #000; display: inline-block; margin-left: 20px; }
         #pinForm { display: block; }
         #controls { display: none; }
+        #pinError { color: red; display: none; }
+        .modeCard { margin: 16px auto; padding: 12px; max-width: 320px; border: 1px solid #ddd; border-radius: 10px; background: #fafafa; }
+        .modeHint { font-size: 0.9rem; color: #555; margin-top: 6px; }
+        #modeStatus { display: block; margin-top: 8px; font-weight: bold; color: #5a2ca0; }
     </style>
 </head>
 <body>
@@ -17,12 +21,22 @@
     
     <div id="pinForm">
         <p>Enter PIN to access controls:</p>
-        <input type="password" id="pinInput" maxlength="4">
+        <label for="pinInput">PIN</label>
+        <input type="password" id="pinInput" maxlength="4" placeholder="4-digit PIN">
         <button onclick="checkPin()">Submit</button>
-        <p id="pinError" style="color: red; display: none;">Incorrect PIN</p>
+        <p id="pinError">Incorrect PIN</p>
     </div>
     
     <div id="controls">
+        <div class="modeCard">
+            <label>
+                <input type="checkbox" id="partyModeToggle">
+                Party / demo mode
+            </label>
+            <span id="modeStatus">Manual colour mode</span>
+            <div class="modeHint">Cycles rainbow chases and sparkles to show off the LEDs.</div>
+        </div>
+
         <p>Click on the color wheel to select a color:</p>
         <canvas id="colorWheel" width="300" height="300"></canvas>
         <div id="colorDisplay"></div>
@@ -85,6 +99,7 @@
         // Add event listeners to controls for resetting timeout
         document.getElementById('colorWheel').addEventListener('click', resetTimeout);
         document.getElementById('brightness').addEventListener('input', resetTimeout);
+        document.getElementById('partyModeToggle').addEventListener('change', resetTimeout);
         
         // Existing code for color wheel and brightness
         const canvas = document.getElementById('colorWheel');
@@ -92,6 +107,8 @@
         const colorDisplay = document.getElementById('colorDisplay');
         const brightnessSlider = document.getElementById('brightness');
         const brightnessValue = document.getElementById('brightnessValue');
+        const partyModeToggle = document.getElementById('partyModeToggle');
+        const modeStatus = document.getElementById('modeStatus');
         let selectedColor = '#ffffff';
         let baseHSL = {h: 0, s: 0, l: 1}; // start with white
         let brightness = 255;
@@ -103,11 +120,31 @@
             colorDisplay.style.backgroundColor = selectedColor;
         }
 
+        function updateModeStatus(enabled) {
+            modeStatus.textContent = enabled ? 'Party mode is active' : 'Manual colour mode';
+        }
+
+        function setPartyMode(enabled) {
+            partyModeToggle.checked = enabled;
+            updateModeStatus(enabled);
+            fetch('/set_mode', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain',
+                },
+                body: `party=${enabled ? 'on' : 'off'}`
+            });
+        }
+
         brightnessSlider.addEventListener('input', (e) => {
             brightness = parseInt(e.target.value);
             brightnessValue.textContent = brightness;
             updateSelectedColor();
             setColor();
+        });
+
+        partyModeToggle.addEventListener('change', (e) => {
+            setPartyMode(e.target.checked);
         });
 
         function drawColorWheel() {
@@ -184,6 +221,11 @@
         updateSelectedColor();
 
         function setColor() {
+            if (partyModeToggle.checked) {
+                partyModeToggle.checked = false;
+                updateModeStatus(false);
+            }
+
             fetch('/set_color', {
                 method: 'POST',
                 headers: {

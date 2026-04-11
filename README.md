@@ -1,12 +1,13 @@
-# ESP32S3 LED Lightstrip Web Controller
+# ESP32 LED Lightstrip Web Controller
 
-This project uses MicroPython on an ESP32S3 board to control an LED lightstrip via a web interface. Colors are selected using an interactive color wheel, and brightness can be adjusted with a slider. Changes are applied automatically without needing to click buttons.
+This project uses MicroPython on an ESP32 board to control an LED lightstrip via a web interface. Colors are selected using an interactive color wheel, and brightness can be adjusted with a slider. Changes are applied automatically without needing to click buttons.
 
 ## Features
 
 - Interactive color wheel showing RGB color space
 - White light option (center of wheel)
 - Brightness control slider (0-255)
+- Party/demo mode with animated rainbow and sparkle effects
 - Real-time color updates
 - PIN-protected access with 60-second timeout
 - Web server running on ESP32
@@ -14,7 +15,7 @@ This project uses MicroPython on an ESP32S3 board to control an LED lightstrip v
 
 ## Hardware Requirements
 
-- ESP32S3 board
+- ESP32 board (the currently connected device identifies as `ESP32_GENERIC_S2`)
 - WS2812 or compatible LED lightstrip
 - Jumper wires
 - Power supply for the LED strip (if needed, depending on strip length)
@@ -61,6 +62,27 @@ See [circuit_diagram.txt](circuit_diagram.txt) for detailed connection instructi
 - **Timeout**: Controls lock after 60 seconds of inactivity, requiring PIN re-entry.
 - **PIN disabling**: Set `pin_disabled = True` in `credentials.py` to skip PIN input altogether.
 - **Mobile**: The interface works on mobile devices connected to the same WiFi network.
+
+VS Code is configured to use the local `typings/` stubs for `machine`, `neopixel`, and `network` while editing.
+
+## Deploy to the ESP32
+
+With the board connected over USB, deploy the current files with:
+
+```bash
+./scripts/deploy.sh
+```
+
+Notes:
+
+- The script auto-detects the board serial port.
+- You can also pass a port explicitly, for example:
+
+  ```bash
+  ./scripts/deploy.sh /dev/cu.usbmodem101
+  ```
+
+- In VS Code, run the task `Deploy to ESP32`.
 
 ## Notes
 
